@@ -6,11 +6,11 @@ const URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2aYIhdBH95KsM-3ohuHeGiPIgd2KzlBtT2CXoqJwVXj3SDiA3-xVu-VDhWxtjETiPWejkXa3lEtpB/pub?output=csv";
 
 function App() {
-    const [table, setTable] = useState([]);
+    const [tableData, setTableData] = useState([]);
     const [tableHeadRow, setTableHeadRow] = useState([]);
+    const [filterOn, setFilterOn] = useState("Favourite Color")
     const [searchValue, setSearchValue] = useState("")
     const [reset, setReset] = useState(false);
-    const [filterOn, setFilterOn] = useState("Favourite Color")
 
     const handleDropdown = (event) => {
         handleReset();
@@ -22,10 +22,15 @@ function App() {
         setSearchValue(event.target.value)
     }
 
+    const handleReset = () => {
+        setReset(!reset);
+        setSearchValue("");
+    }
+
     useEffect(() => {
         console.log("in filter effect")
         if (searchValue) {
-            setTable(prev => prev.filter(value =>
+            setTableData(prev => prev.filter(value =>
                 (filterOn === "Budget" && value["Budget"].toLowerCase().includes(searchValue)) ||
                 (filterOn === "Favourite Color" && value["Favourite Color"].toLowerCase().includes(searchValue)) ||
                 (filterOn === "Favourite car" && value["Favourite car"].toLowerCase().includes(searchValue)) ||
@@ -36,10 +41,6 @@ function App() {
         }
     }, [searchValue])
 
-    const handleReset = () => {
-        setReset(!reset);
-        setSearchValue("");
-    }
 
     useEffect(() => {
         Papa.parse(URL, {
@@ -47,7 +48,7 @@ function App() {
             header: true,
             complete: (results) => {
 
-                setTable(results.data);
+                setTableData(results.data);
                 console.log(results.data);
 
                 let headers = [];
@@ -76,21 +77,21 @@ function App() {
                    onChange={handleSearch}/>
             {searchValue && <button type={"button"} onClick={handleReset}>Remove Filter</button>}
 
-            {tableHeadRow && table ? (
-                <table>
+            {tableHeadRow && tableData ? (
+                <table style={{border: "2px solid black"}}>
                     <thead>
                     <tr>
                         {tableHeadRow.map((value, index) => {
-                            return <th key={index}>{value}</th>;
+                            return <th style={{border: "2px solid black"}} key={index}>{value}</th>;
                         })}
                     </tr>
                     </thead>
 
                     <tbody>
-                    {table.map((value, index) => (
+                    {tableData.map((value, index) => (
                         <tr key={index}>
                             {tableHeadRow.map((subValue) => (
-                                <td>{value[subValue]}</td>
+                                <td style={{border: "2px solid black"}}>{value[subValue]}</td>
                             ))}
                         </tr>
                     ))}
