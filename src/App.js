@@ -9,47 +9,38 @@ function App() {
     const [table, setTable] = useState([]);
     const [tableHeadRow, setTableHeadRow] = useState([]);
     const [searchValue, setSearchValue] = useState("")
-    const [findValue, setFindValue] = useState("")
     const [reset, setReset] = useState(false);
     const [filterOn, setFilterOn] = useState("Favourite Color")
 
     const handleDropdown = (event) => {
+        handleReset();
         setFilterOn(event.target.value);
     }
+
     const handleSearch = (event) => {
         console.log("search:  ", event.target.value);
         setSearchValue(event.target.value)
     }
 
-    const handleFind = () => {
-        setSearchValue(prev => prev.toLowerCase())
-        setFindValue(() => searchValue);
-        console.log("filter on: ", filterOn, " , search Value: ", searchValue);
-
-        /*
-    setTable(prev => prev.filter(value =>
-        (filterOn === "Budget" && value["Budget"].toLowerCase() === searchValue) ||
-        (filterOn === "Favourite Color" && value["Favourite Color"].toLowerCase() === searchValue) ||
-        (filterOn === "Favourite car" && value["Favourite car"].toLowerCase() === searchValue) ||
-        (filterOn === "Purpose" && value["Purpose"].toLowerCase() === searchValue)
-        ));
-         */
-    }
-
     useEffect(() => {
-        setTable(prev => prev.filter(value =>
-            (filterOn === "Budget" && value["Budget"].toLowerCase().includes(searchValue)) ||
-            (filterOn === "Favourite Color" && value["Favourite Color"].toLowerCase().includes(searchValue)) ||
-            (filterOn === "Favourite car" && value["Favourite car"].toLowerCase().includes(searchValue)) ||
-            (filterOn === "Purpose" && value["Purpose"].toLowerCase().includes(searchValue))
-        ));
+        console.log("in filter effect")
+        if (searchValue) {
+            setTable(prev => prev.filter(value =>
+                (filterOn === "Budget" && value["Budget"].toLowerCase().includes(searchValue)) ||
+                (filterOn === "Favourite Color" && value["Favourite Color"].toLowerCase().includes(searchValue)) ||
+                (filterOn === "Favourite car" && value["Favourite car"].toLowerCase().includes(searchValue)) ||
+                (filterOn === "Purpose" && value["Purpose"].toLowerCase().includes(searchValue))
+            ));
+        } else {
+            handleReset();
+        }
     }, [searchValue])
 
     const handleReset = () => {
         setReset(!reset);
-        setFindValue("");
         setSearchValue("");
     }
+
     useEffect(() => {
         Papa.parse(URL, {
             download: true,
@@ -83,7 +74,6 @@ function App() {
 
             <input placeholder={"search"} type="text" name="search" value={searchValue}
                    onChange={handleSearch}/>
-            <button type={"button"} onClick={handleFind}>Search</button>
             {searchValue && <button type={"button"} onClick={handleReset}>Remove Filter</button>}
 
             {tableHeadRow && table ? (
